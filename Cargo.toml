@@ -1,0 +1,12 @@
+[package]
+name = "light-tool"
+version = "0.1.0"
+authors = ["getcharzp@gmail.com"]
+edition = "2021"
+description = "轻量级的Rust工具库"
+license = "MIT"
+repository = "https://github.com/getcharzp/light-tool"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
