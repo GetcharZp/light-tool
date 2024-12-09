@@ -38,9 +38,9 @@ impl XorShiftRng {
 ///
 /// ```no_run
 /// use light_tool::random;
-/// println!("random string: {}", random::random_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10))
+/// println!("random string: {}", random::str("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10))
 /// ```
-pub fn random_str(s :&str, len: usize) -> String {
+pub fn str(s :&str, len: usize) -> String {
     XorShiftRng::new(None).gen_random(s, len)
 }
 
@@ -50,10 +50,10 @@ pub fn random_str(s :&str, len: usize) -> String {
 ///
 /// ```no_run
 /// use light_tool::random;
-/// println!("random number: {}", random::random_num(6))
+/// println!("random number: {}", random::num(6))
 /// ```
-pub fn random_num(len: usize) -> String {
-    random_str("0123456789", len)
+pub fn num(len: usize) -> String {
+    str("0123456789", len)
 }
 
 /// Generate random alpha
@@ -61,10 +61,10 @@ pub fn random_num(len: usize) -> String {
 /// # Example
 /// ```no_run
 /// use light_tool::random;
-/// println!("random alpha: {}", random::random_alpha(6))
+/// println!("random alpha: {}", random::alpha(6))
 /// ```
-pub fn random_alpha(len: usize) -> String {
-    random_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", len)
+pub fn alpha(len: usize) -> String {
+    str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", len)
 }
 
 /// Generate random alpha number
@@ -72,10 +72,10 @@ pub fn random_alpha(len: usize) -> String {
 /// # Example
 /// ```no_run
 /// use light_tool::random;
-/// println!("random alpha number: {}", random::random_alpha_num(6))
+/// println!("random alpha number: {}", random::alpha_num(6))
 /// ```
-pub fn random_alpha_num(len: usize) -> String {
-    random_str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", len)
+pub fn alpha_num(len: usize) -> String {
+    str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", len)
 }
 
 /// Generate random number in range
@@ -83,9 +83,9 @@ pub fn random_alpha_num(len: usize) -> String {
 /// # Example
 /// ```no_run
 /// use light_tool::random;
-/// println!("random range: {}", random::random_range(1, 10))
+/// println!("random range: {}", random::range(1, 10))
 /// ```
-pub fn random_range(min: u64, max: u64) -> u64 {
+pub fn range(min: u64, max: u64) -> u64 {
     XorShiftRng::new(None).gen_range(min, max)
 }
 
@@ -95,26 +95,26 @@ mod tests {
 
     #[test]
     fn test_random_str() {
-        println!("random_str: {}", random_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 10));
+        println!("random_str: {}", str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 10));
     }
 
     #[test]
     fn test_random_num() {
-        println!("random_num: {}", random_num(6));
+        println!("random_num: {}", num(6));
     }
 
     #[test]
     fn test_random_alpha() {
-        println!("random_alpha: {}", random_alpha(8));
+        println!("random_alpha: {}", alpha(8));
     }
 
     #[test]
     fn test_random_alpha_num() {
-        println!("random_alpha_num: {}", random_alpha_num(16));
+        println!("random_alpha_num: {}", alpha_num(16));
     }
 
     #[test]
     fn test_random_range() {
-        println!("random_range: {}", random_range(1, 3));
+        println!("random_range: {}", range(1, 3));
     }
 }
