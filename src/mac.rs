@@ -6,7 +6,7 @@ use std::process::Command;
 ///
 /// ```no_run
 /// use light_tool::mac;
-/// println!("mac address: {}", mac::address())
+/// println!("mac address: {}", mac::address().unwrap())
 /// ```
 pub fn address() -> Option<String> {
     let output = match std::env::consts::OS {

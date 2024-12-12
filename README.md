@@ -24,4 +24,5 @@ println!("{}", timestamp::seconds());
 + **random::range()** 指定范围内的随机数 [最小值, 最大值)
 + **md5::str()** 获取MD5值
 + **md5::salt()** 获取加盐后的MD5值
-+ **mac::address()** 获取加盐后的MD5值
++ **mac::address()** 获取Mac地址
++ **uuid::new()** UUID
