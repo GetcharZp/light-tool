@@ -26,3 +26,7 @@ println!("{}", timestamp::seconds());
 + **md5::salt()** 获取加盐后的MD5值
 + **mac::address()** 获取Mac地址
 + **uuid::new()** UUID
++ **http::get()** GET 请求
++ **http::post()** POST 请求
++ **http::put()** PUT 请求
++ **http::delete()** DELETE 请求

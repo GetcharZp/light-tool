@@ -11,7 +11,7 @@ use crate::{random, timestamp, mac, md5};
 pub fn new() -> String {
     let s =md5::str(format!("{}-{}-{}",  random::alpha_num(36),
                             timestamp::nano_seconds(),
-                            mac::address().unwrap_or_else(|| {timestamp::nano_seconds().to_string()})));
+                            mac::address().unwrap_or(timestamp::nano_seconds().to_string())));
 
     format!("{}-{}-{}-{}-{}", &s[0..8], &s[8..12], &s[12..16], &s[16..20], &s[20..])
 }

@@ -3,3 +3,4 @@ pub mod random;
 pub mod md5;
 pub mod mac;
 pub mod uuid;
+pub mod http;

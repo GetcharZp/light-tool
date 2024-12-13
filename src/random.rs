@@ -7,7 +7,7 @@ struct XorShiftRng {
 
 impl XorShiftRng {
     fn new(seed: Option<u64>) -> Self {
-        let seed = seed.unwrap_or_else(|| timestamp::nano_seconds());
+        let seed = seed.unwrap_or(timestamp::nano_seconds());
         XorShiftRng { state: seed }
     }
 
