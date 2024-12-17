@@ -12,7 +12,7 @@ use std::io::ErrorKind::NotFound;
 /// # Example
 /// ```txt
 /// use light_tool::file;
-/// file::copy("/opt/light-tool/tt.txt", "/opt/light-tool/tt/1/tt.txt").expect("copy error.")
+/// file::copy("/opt/light-tool/tt.txt", "/opt/light-tool/tt/1/tt.txt").unwrap()
 /// ```
 pub fn copy(src_file: &str, dst_file: &str) -> io::Result<()> {
     if !Path::new(src_file).exists() {
@@ -32,7 +32,7 @@ pub fn copy(src_file: &str, dst_file: &str) -> io::Result<()> {
 /// # Example
 /// ```txt
 /// use light_tool::file;
-/// file::rename("/opt/light-tool/tt.txt", "/opt/light-tool/tt/1/tt.txt").expect("file move error.")
+/// file::rename("/opt/light-tool/tt.txt", "/opt/light-tool/tt/1/tt.txt").unwrap()
 /// ```
 pub fn rename(src_file: &str, dst_file: &str) -> io::Result<()> {
     if !Path::new(src_file).exists() {
@@ -43,7 +43,14 @@ pub fn rename(src_file: &str, dst_file: &str) -> io::Result<()> {
     Ok(())
 }
 
-fn create_parent_dir(dst_file: &str) -> io::Result<()> {
+/// CreateParentDir: 创建目标文件的父目录
+///
+/// # Example
+/// ```txt
+/// use light_tool::file;
+/// file::create_parent_dir("/opt/light-tool/tt/1/tt.txt").unwrap()
+/// ```
+pub fn create_parent_dir(dst_file: &str) -> io::Result<()> {
     if let Some(parent_dir) = Path::new(dst_file).parent() {
         if !parent_dir.exists() {
             fs::create_dir_all(parent_dir)?;
@@ -69,6 +76,13 @@ mod tests {
     fn test_file_move() {
         if let Err(e) = rename("/opt/light-tool/tt.txt", "/opt/light-tool/tt/1/tt.txt") {
             println!("file move error: {}", e);
+        }
+    }
+
+    #[test]
+    fn test_create_parent_dir() {
+        if let Err(e) = create_parent_dir("/opt/light-tool/tt/1/tt.txt") {
+            println!("create parent dir error: {}", e);
         }
     }
 }
