@@ -4,3 +4,4 @@ pub mod md5;
 pub mod mac;
 pub mod uuid;
 pub mod http;
+pub mod file;

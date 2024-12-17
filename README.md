@@ -30,3 +30,5 @@ println!("{}", timestamp::seconds());
 + **http::post()** POST 请求
 + **http::put()** PUT 请求
 + **http::delete()** DELETE 请求
++ **file::copy()** 拷贝文件
++ **file::rename()** 移动文件
