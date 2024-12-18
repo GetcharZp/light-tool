@@ -33,3 +33,4 @@ println!("{}", timestamp::seconds());
 + **file::copy()** 拷贝文件
 + **file::rename()** 移动文件
 + **file::create_parent_dir()** 创建目标文件的父目录
++ **hmac::sha256()** SHA-256 哈希函数

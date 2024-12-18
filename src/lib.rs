@@ -5,3 +5,4 @@ pub mod mac;
 pub mod uuid;
 pub mod http;
 pub mod file;
+pub mod hmac;

@@ -1,6 +1,6 @@
 [package]
 name = "light-tool"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["getcharzp@gmail.com"]
 edition = "2021"
 description = "轻量级的Rust工具库"
