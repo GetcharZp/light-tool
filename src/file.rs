@@ -1,7 +1,9 @@
 use std::{fs, io};
+use std::fs::OpenOptions;
 use std::path::Path;
 use std::io::Error;
 use std::io::ErrorKind::NotFound;
+use std::io::Write;
 
 /// FileCopy: 拷贝文件
 ///
@@ -43,6 +45,29 @@ pub fn rename(src_file: &str, dst_file: &str) -> io::Result<()> {
     Ok(())
 }
 
+/// FileAppend: 文件追加内容
+///
+/// # 参数:
+/// - `file_path`: 文件绝对路径
+/// - `content`: 要追加的内容
+///
+/// # Example
+/// ```txt
+/// use light_tool::file;
+/// use light_tool::random;
+/// // 可以通过 \n 换行：format!("\n{}", random::num(6)).as_str()
+/// file::append("/opt/light-tool/tt.txt", random::num(6).as_str()).unwrap();
+/// ```
+pub fn append(file_path: &str, content: &str) -> io::Result<()> {
+    create_parent_dir(file_path)?;
+    let mut file = OpenOptions::new()
+        .write(true).append(true).create(true).open(file_path)?;
+
+    write!(file, "{}", content)?;
+
+    Ok(())
+}
+
 /// CreateParentDir: 创建目标文件的父目录
 ///
 /// # Example
@@ -63,6 +88,7 @@ pub fn create_parent_dir(dst_file: &str) -> io::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use crate::random;
     use super::*;
 
     #[test]
@@ -76,6 +102,13 @@ mod tests {
     fn test_file_move() {
         if let Err(e) = rename("/opt/light-tool/tt.txt", "/opt/light-tool/tt/1/tt.txt") {
             println!("file move error: {}", e);
+        }
+    }
+
+    #[test]
+    fn test_append() {
+        if let Err(e) = append("/opt/light-tool/tt.txt", format!("\n{}", random::num(6)).as_str()) {
+            println!("append error: {}", e);
         }
     }
 
