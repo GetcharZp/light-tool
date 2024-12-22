@@ -158,7 +158,7 @@ mod tests {
 
     #[test]
     fn test_post() {
-        let response = post("http://192.168.111.250:9610/api/v1/index/system/state/get", None, None).
+        let response = post("http://192.168.111.30:9610/api/v1/index/system/state/get", None, None).
             expect("POST request failed");
         // Response: {"code":200,"msg":"success","data":{"state_all":"CLOSE","processes":[]}}
         println!("Response: {}", response);
