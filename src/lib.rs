@@ -7,3 +7,4 @@ pub mod http;
 pub mod file;
 pub mod hmac;
 mod lazy;
+pub mod base64;

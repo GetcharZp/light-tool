@@ -36,3 +36,5 @@ println!("{}", timestamp::seconds());
 + **file::create_parent_dir()** 创建目标文件的父目录
 + **file::append()** 文件追加内容
 + **hmac::sha256()** SHA-256 哈希函数
++ **base64::encode()** Base64 编码
++ **base64::decode()** Base64 解码
