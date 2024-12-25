@@ -4,12 +4,17 @@ use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
 use std::fmt::Write as FmtWrite;
+use std::fs;
 
 struct HttpClient {
     host: String,
     port: u16,
     path: String,
     timeout: Duration,
+}
+
+struct HttpResponse {
+    body: Vec<u8>,
 }
 
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(5);
@@ -29,7 +34,7 @@ impl HttpClient {
         method: &str,
         headers: Option<HashMap<&str, &str>>,
         body: Option<&str>,
-    ) -> Result<String, Box<dyn  Error>> {
+    ) -> Result<HttpResponse, Box<dyn  Error>> {
         let addr = format!("{}:{}", self.host, self.port);
         let mut addrs = addr.to_socket_addrs()?;
         let socket_addr = addrs.next().ok_or_else(|| std::io::Error::new(std::io::ErrorKind::Other, "Could not resolve address"))?;
@@ -59,11 +64,13 @@ impl HttpClient {
 
         stream.write_all(request.as_bytes())?;
 
-        let mut response = String::new();
-        stream.read_to_string(&mut response)?;
+        let mut response = Vec::new();
+        stream.read_to_end(&mut response)?;
 
-        let body = response.split("\r\n\r\n").nth(1).unwrap_or("");
-        Ok(body.to_string())
+        let (_, resp_body) = parse_http_response(&response)?;
+        Ok(HttpResponse{
+            body: resp_body
+        })
     }
 }
 
@@ -90,6 +97,20 @@ fn client(url: &str, timeout: Duration) -> Result<HttpClient, Box<dyn Error>> {
     Ok(HttpClient::new(&host, port, &path, timeout))
 }
 
+fn parse_http_response(response: &[u8]) -> Result<(String, Vec<u8>), Box<dyn Error>> {
+    let response_str = String::from_utf8_lossy(response);
+    let parts: Vec<&str> = response_str.split("\r\n\r\n").collect();
+
+    if parts.len() < 2 {
+        return Err("Invalid HTTP response".into());
+    }
+
+    let headers = parts[0].to_string();
+    let body = response[response_str.find("\r\n\r\n").unwrap_or(0) + 4..].to_vec();
+
+    Ok((headers, body))
+}
+
 /// GET Request
 ///
 /// # Example
@@ -100,7 +121,8 @@ fn client(url: &str, timeout: Duration) -> Result<HttpClient, Box<dyn Error>> {
 /// ```
 pub fn get(url: &str, headers: Option<HashMap<&str, &str>>) -> Result<String, Box<dyn Error>> {
     let client = client(url, DEFAULT_TIMEOUT)?;
-    client.request("GET", headers, None)
+    let response = client.request("GET", headers, None)?;
+    Ok(String::from_utf8_lossy(&response.body).to_string())
 }
 
 /// POST Request
@@ -113,7 +135,8 @@ pub fn get(url: &str, headers: Option<HashMap<&str, &str>>) -> Result<String, Bo
 /// ```
 pub fn post(url: &str, headers: Option<HashMap<&str, &str>>, body: Option<&str>) -> Result<String, Box<dyn Error>> {
     let client = client(url, DEFAULT_TIMEOUT)?;
-    client.request("POST", headers, body)
+    let response = client.request("POST", headers, body)?;
+    Ok(String::from_utf8_lossy(&response.body).to_string())
 }
 
 /// PUT Request
@@ -127,7 +150,8 @@ pub fn post(url: &str, headers: Option<HashMap<&str, &str>>, body: Option<&str>)
 /// ```
 pub fn put(url: &str, headers: Option<HashMap<&str, &str>>, body: Option<&str>) -> Result<String, Box<dyn Error>> {
     let client = client(url, DEFAULT_TIMEOUT)?;
-    client.request("PUT", headers, body)
+    let response = client.request("PUT", headers, body)?;
+    Ok(String::from_utf8_lossy(&response.body).to_string())
 }
 
 /// DELETE Request
@@ -140,7 +164,25 @@ pub fn put(url: &str, headers: Option<HashMap<&str, &str>>, body: Option<&str>) 
 /// ```
 pub fn delete(url: &str, headers: Option<HashMap<&str, &str>>) -> Result<String, Box<dyn Error>> {
     let client = client(url, DEFAULT_TIMEOUT)?;
-    client.request("DELETE", headers, None)
+    let response = client.request("DELETE", headers, None)?;
+    Ok(String::from_utf8_lossy(&response.body).to_string())
+}
+
+/// Download File
+///
+/// # Example
+///
+/// ```txt
+/// use light_tool::http;
+/// assert_eq!(http::download("http://192.168.111.202:8000/tmp/test.png", "/opt/light-tool/image.png", None).is_ok(), true)
+/// ```
+pub fn download(url: &str, path: &str, timeout: Option<Duration>) -> Result<(), Box<dyn Error>> {
+    let client = client(url, timeout.unwrap_or(DEFAULT_TIMEOUT))?;
+    let response = client.request("GET", None, None)?;
+
+    fs::write(path, &response.body)?;
+
+    Ok(())
 }
 
 
@@ -179,5 +221,14 @@ mod tests {
             expect("DELETE request failed");
         // Response: {"code":200,"msg":"成功","data":null}
         println!("Response: {}", response);
+    }
+
+    #[test]
+    fn test_download() {
+        let response = download("http://192.168.111.202:8000/tmp/test.png",
+                                "/opt/light-tool/image.png", None);
+        if let Err(e) = response {
+            println!("Download failed: {:?}", e);
+        }
     }
 }
