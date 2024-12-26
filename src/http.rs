@@ -98,17 +98,18 @@ fn client(url: &str, timeout: Duration) -> Result<HttpClient, Box<dyn Error>> {
 }
 
 fn parse_http_response(response: &[u8]) -> Result<(String, Vec<u8>), Box<dyn Error>> {
-    let response_str = String::from_utf8_lossy(response);
-    let parts: Vec<&str> = response_str.split("\r\n\r\n").collect();
+    // 在字节数组上查找 "\r\n\r\n" 分隔符
+    if let Some(pos) = response.windows(4).position(|window| window == b"\r\n\r\n") {
+        // 提取响应头（字节流）
+        let headers = String::from_utf8_lossy(&response[..pos]).to_string();
 
-    if parts.len() < 2 {
-        return Err("Invalid HTTP response".into());
+        // 提取响应体（字节流）
+        let body = response[pos + 4..].to_vec();  // 跳过 "\r\n\r\n" 的 4 个字节
+
+        Ok((headers, body))
+    } else {
+        Err("Invalid HTTP response".into())
     }
-
-    let headers = parts[0].to_string();
-    let body = response[response_str.find("\r\n\r\n").unwrap_or(0) + 4..].to_vec();
-
-    Ok((headers, body))
 }
 
 /// GET Request
