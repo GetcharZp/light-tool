@@ -121,6 +121,27 @@ where
     digest.iter().map(|byte| format!("{:02x}", byte)).collect()
 }
 
+/// Generate md5 string with iteration (迭代多次求md5)
+///
+/// # Example
+///
+/// ```rust
+/// use light_tool::md5;
+/// println!("md5 string with iteration: {}", md5::str_iteration("hello world", 2))
+/// ```
+pub fn str_iteration<T>(input: T, iterations: u32) -> String
+where
+    T: AsRef<[u8]>,
+{
+    let mut current_input = input.as_ref().to_vec();
+    for _ in 0..iterations {
+        let mut md5 = Md5::new();
+        md5.update(&current_input);
+        current_input = md5.finalize().iter().map(|byte| format!("{:02x}", byte)).collect::<String>().into_bytes();
+    }
+    String::from_utf8(current_input).unwrap()
+}
+
 /// Generate md5 string with salt
 ///
 /// # Example
@@ -162,4 +183,21 @@ mod tests {
             "d41d8cd98f00b204e9800998ecf8427e"
         );
     }
+
+    #[test]
+    fn test_md5_iteration() {
+        assert_eq!(
+            str_iteration("hello world", 1),
+            "5eb63bbbe01eeed093cb22bb8f5acdc3"
+        );
+        assert_eq!(
+            str_iteration("hello world", 2),
+            "c0b0ef2d0f76f0133b83a9b82c1c7326"
+        );
+        assert_eq!(
+            str_iteration("hello world", 100),
+            "c1decf2571e565e4129f6136a55bb941"
+        );
+    }
+
 }

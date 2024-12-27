@@ -23,6 +23,7 @@ println!("{}", timestamp::seconds());
 + **random::alpha_num()** 随机字母数字
 + **random::range()** 指定范围内的随机数 [最小值, 最大值)
 + **md5::str()** 获取MD5值
++ **md5::str_iteration()** 迭代多次求md5
 + **md5::salt()** 获取加盐后的MD5值
 + **mac::address()** 获取Mac地址
 + **id::uuid()** UUID
