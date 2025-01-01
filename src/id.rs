@@ -1,3 +1,5 @@
+use std::process;
+use std::sync::atomic::{AtomicU32, Ordering};
 use crate::{random, timestamp, mac, md5};
 use crate::lazy::Lazy;
 use std::sync::Mutex;
@@ -80,8 +82,6 @@ impl SnowflakeIdGenerator {
     }
 }
 
-
-
 // 静态变量使用自定义的 OnceCell 进行延迟初始化
 static GENERATOR: Lazy<Mutex<SnowflakeIdGenerator>> = Lazy::new(|| Mutex::new(SnowflakeIdGenerator::new()));
 
@@ -98,6 +98,57 @@ pub fn snowflake_id() -> u64 {
     generator.generate_id()
 }
 
+/// A struct representing a MongoDB ObjectId
+struct ObjectId {
+    bytes: [u8; 12],
+}
+
+// Global counter for uniqueness
+static COUNTER: AtomicU32 = AtomicU32::new(0);
+
+impl ObjectId {
+    /// Generate a new ObjectId
+    pub fn new() -> Self {
+        let mut bytes = [0u8; 12];
+
+        // 1. Add the current timestamp (4 bytes)
+        bytes[..4].copy_from_slice(&(timestamp::seconds() as u32).to_be_bytes());
+
+        // 2. Add the machine identifier (5 bytes)
+        let mac = mac::address().unwrap_or(random::alpha(16));
+        bytes[4..9].copy_from_slice(&mac.as_bytes()[..5]);
+
+        // 3. Add the process ID (2 bytes)
+        let pid = process::id() as u16;
+        bytes[9..11].copy_from_slice(&pid.to_be_bytes());
+
+        // 4. Add the counter (3 bytes)
+        let counter = COUNTER.fetch_add(1, Ordering::SeqCst) & 0xFFFFFF; // Keep only 3 bytes
+        bytes[11] = (counter & 0xFF) as u8;         // Lowest byte
+        bytes[10] = ((counter >> 8) & 0xFF) as u8;  // Middle byte
+        bytes[9] |= ((counter >> 16) & 0xFF) as u8; // Highest byte (shared with PID)
+
+        ObjectId { bytes }
+    }
+
+    /// Convert the ObjectId to a hexadecimal string
+    pub fn to_hex(&self) -> String {
+        self.bytes.iter().map(|byte| format!("{:02x}", byte)).collect()
+    }
+}
+
+/// Generate MongoDB ObjectID
+///
+/// # Example
+///
+/// ```rust
+/// use light_tool::id;
+/// println!("object id: {}", id::object_id())
+/// ```
+pub fn object_id() -> String {
+    ObjectId::new().to_hex()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -111,6 +162,13 @@ mod tests {
     fn test_snowflake_id() {
         for _ in 0..10 {
             println!("snowflake id: {}", snowflake_id());
+        }
+    }
+
+    #[test]
+    fn test_object_id() {
+        for _ in 0..16 {
+            println!("ObjectId: {}", object_id());
         }
     }
 }

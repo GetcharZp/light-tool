@@ -28,6 +28,7 @@ println!("{}", timestamp::seconds());
 + **mac::address()** 获取Mac地址
 + **id::uuid()** UUID
 + **id::snowflake_id()** 雪花码
++ **id::object_id()** ObjectID
 + **http::get()** GET 请求
 + **http::post()** POST 请求
 + **http::put()** PUT 请求
