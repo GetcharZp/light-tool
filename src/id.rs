@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use crate::{random, timestamp, mac, md5};
 use crate::lazy::Lazy;
 use std::sync::Mutex;
+use crate::mac::MAC;
 
 
 /// Generate uuid by random_str - timestamp - mac
@@ -115,7 +116,7 @@ impl ObjectId {
         bytes[..4].copy_from_slice(&(timestamp::seconds() as u32).to_be_bytes());
 
         // 2. Add the machine identifier (5 bytes)
-        let mac = mac::address().unwrap_or(random::alpha(16));
+        let mac = MAC.get();
         bytes[4..9].copy_from_slice(&mac.as_bytes()[..5]);
 
         // 3. Add the process ID (2 bytes)

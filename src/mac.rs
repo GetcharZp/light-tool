@@ -1,4 +1,10 @@
 use std::process::Command;
+use crate::lazy::Lazy;
+use crate::random;
+
+pub static MAC: Lazy<String> = Lazy::new(|| {
+    address().unwrap_or(random::alpha(17))
+});
 
 /// Returns one MAC address of the current machine
 ///
